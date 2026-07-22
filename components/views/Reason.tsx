@@ -1,5 +1,6 @@
+ 
 "use client";
-
+ 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Paperclip, ScanLine, Mic, ArrowRight, FileText, UploadCloud } from "lucide-react";
@@ -12,17 +13,17 @@ import ThreeField from "../ThreeField";
 import ReasoningTrace, { type TraceState } from "../ReasoningTrace";
 import AnswerCard from "../AnswerCard";
 import { Button } from "../ui/button";
-
+ 
 type ChatMsg =
   | { role: "user"; text: string; files: string[] }
   | { role: "assistant"; data: ReasonAnswer; streaming: boolean };
-
+ 
 const SR_LOCALES: Record<string, string> = {
   hi: "hi-IN", bn: "bn-IN", ta: "ta-IN", te: "te-IN", mr: "mr-IN", gu: "gu-IN",
   kn: "kn-IN", ml: "ml-IN", pa: "pa-IN", ur: "ur-IN", ar: "ar-SA", zh: "zh-CN",
   es: "es-ES", fr: "fr-FR", de: "de-DE", pt: "pt-BR", ru: "ru-RU",
 };
-
+ 
 async function askBrain(query: string, langName: string, attachments: UploadedDoc[]): Promise<ReasonAnswer> {
   const res = await fetch("/api/reason", {
     method: "POST",
@@ -33,7 +34,7 @@ async function askBrain(query: string, langName: string, attachments: UploadedDo
   if (!res.ok) throw new Error(data.error || "Request failed");
   return data as ReasonAnswer;
 }
-
+ 
 export default function Reason({
   setHighlight,
   pendingQuery,
@@ -47,7 +48,7 @@ export default function Reason({
   const uploads = useCortex((s) => s.uploads);
   const addUpload = useCortex((s) => s.addUpload);
   const removeUpload = useCortex((s) => s.removeUpload);
-
+ 
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
@@ -60,16 +61,16 @@ export default function Reason({
   const recogRef = useRef<any>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const camRef = useRef<HTMLInputElement>(null);
-
+ 
   useEffect(() => {
     if (pendingQuery) { run(pendingQuery); clearPending(); }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingQuery]);
-
+ 
   useEffect(() => {
     if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
   }, [messages, trace]);
-
+ 
   const onFiles = (files: FileList | null) => {
     Array.from(files || []).forEach((f) => {
       if (f.size > 6 * 1024 * 1024) { setNote(`"${f.name}" is over 6 MB — use a smaller file for the demo.`); return; }
@@ -82,12 +83,12 @@ export default function Reason({
       reader.readAsDataURL(f);
     });
   };
-
+ 
   const onDragEnter = (e: React.DragEvent) => { e.preventDefault(); dragCounter.current++; if (e.dataTransfer.types.includes("Files")) setDragging(true); };
   const onDragOver = (e: React.DragEvent) => e.preventDefault();
   const onDragLeave = (e: React.DragEvent) => { e.preventDefault(); dragCounter.current--; if (dragCounter.current <= 0) { dragCounter.current = 0; setDragging(false); } };
   const onDrop = (e: React.DragEvent) => { e.preventDefault(); dragCounter.current = 0; setDragging(false); onFiles(e.dataTransfer.files); };
-
+ 
   const startVoice = () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { setNote("Live mic needs a browser with Web Speech (Chrome). Production should route voice through Bhashini/Sarvam so it also works on iPhone."); return; }
@@ -107,7 +108,7 @@ export default function Reason({
     } catch { setListening(false); setNote("Voice unavailable in this browser."); }
   };
   const stopVoice = () => { try { recogRef.current?.stop(); } catch {} setListening(false); };
-
+ 
   async function run(qText?: string) {
     const q = (qText ?? input).trim();
     if (!q || busy) return;
@@ -115,19 +116,19 @@ export default function Reason({
     setInput("");
     setMessages((m) => [...m, { role: "user", text: q, files: uploads.map((u) => u.name) }]);
     setBusy(true);
-
+ 
     const langName = lang; // API resolves display name server-side via prompt only; pass code is fine for prompting
     const live = askBrain(q, langName, uploads).catch(() => null);
     const demo = pickDemo(q);
     const plan = demo?.agents ?? ["router", "retrieval", "reasoning", "synthesis"];
     setTrace({ agents: plan, step: 0, reasoning: [] });
     setHighlight([]);
-
+ 
     for (let i = 0; i < plan.length; i++) {
       await sleep(340);
       setTrace((tr) => (tr ? { ...tr, step: i + 1 } : tr));
     }
-
+ 
     const data: ReasonAnswer =
       (await live) ||
       demo || {
@@ -140,7 +141,7 @@ export default function Reason({
         workflow: null,
         citations: [],
       };
-
+ 
     setHighlight(data.connections || []);
     const steps = data.reasoning || [];
     for (let i = 0; i < steps.length; i++) {
@@ -152,7 +153,7 @@ export default function Reason({
     setTrace(null);
     setBusy(false);
   }
-
+ 
   const empty = messages.length === 0 && !trace;
   const samples = DEMO.map((d) => d.q);
   const steps3: [string, string, string, React.ElementType][] = [
@@ -160,7 +161,7 @@ export default function Reason({
     ["s2t", "s2d", "#4FE0B0", Sparkline],
     ["s3t", "s3d", "#FF7A3C", CheckAction],
   ];
-
+ 
   return (
     <div
       className="relative flex h-full flex-col"
@@ -181,7 +182,7 @@ export default function Reason({
           </div>
         </motion.div>
       )}
-
+ 
       <div ref={scroller} className="relative flex-1 overflow-y-auto">
         {empty && (
           <div className="relative">
@@ -195,7 +196,7 @@ export default function Reason({
                 <span className="bg-gradient-to-r from-amber to-gold bg-clip-text text-transparent">{t(lang, "hero2")}</span>
               </h1>
               <p className="mt-4 max-w-[580px] text-[15px] leading-relaxed text-muted">{t(lang, "heroSub")}</p>
-
+ 
               <div className="mt-7">
                 <div className="mb-3 font-mono text-[11px] tracking-wide text-amber">{t(lang, "what")}</div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -216,7 +217,7 @@ export default function Reason({
                   ))}
                 </div>
               </div>
-
+ 
               <div className="mt-7 font-mono text-[11px] tracking-wide text-faint">{t(lang, "tryThis").toUpperCase()}</div>
               <div className="mt-3 grid gap-2.5">
                 {samples.map((s, i) => (
@@ -234,7 +235,7 @@ export default function Reason({
                   </motion.button>
                 ))}
               </div>
-
+ 
               <div className="mt-6 flex flex-wrap items-center gap-2">
                 <span className="font-mono text-[9.5px] tracking-wide text-faint">GROUNDED IN REAL SOURCES</span>
                 {PROVENANCE.map((p) => (
@@ -244,7 +245,7 @@ export default function Reason({
             </div>
           </div>
         )}
-
+ 
         <div className={empty ? "px-6 pb-5" : "px-6 py-5"}>
           {messages.map((m, i) => (
             <div key={i} className="mx-auto mb-5 max-w-[830px]">
@@ -273,7 +274,7 @@ export default function Reason({
           )}
         </div>
       </div>
-
+ 
       {uploads.length > 0 && (
         <div className="mx-auto flex w-full max-w-[882px] flex-wrap items-center gap-2 px-6 pt-2">
           <span className="font-mono text-[10px] tracking-wide text-faint">{t(lang, "ingested").toUpperCase()}</span>
@@ -286,7 +287,7 @@ export default function Reason({
         </div>
       )}
       {note && <div className="mx-auto mt-1.5 max-w-[830px] px-6 font-mono text-[11.5px] text-gold">{note}</div>}
-
+ 
       <div className="mt-2 border-t border-border bg-panel px-6 py-3.5">
         <input ref={fileRef} type="file" accept="application/pdf,image/*" multiple className="hidden" onChange={(e) => onFiles(e.target.files)} />
         <input ref={camRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(e) => onFiles(e.target.files)} />
@@ -322,7 +323,7 @@ export default function Reason({
     </div>
   );
 }
-
+ 
 function MicWave() {
   return (
     <span className="flex h-4 items-center gap-[2px]">
@@ -337,7 +338,7 @@ function MicWave() {
     </span>
   );
 }
-
+ 
 function Sparkline(props: any) {
   return (
     <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
