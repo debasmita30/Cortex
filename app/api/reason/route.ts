@@ -4,7 +4,7 @@ import type { UploadedDoc } from "@/lib/types";
 
 export const runtime = "nodejs";
 
-// Swap this string if you want a different Gemini model later.
+
 const GEMINI_MODEL = "gemini-3.5-flash";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 
