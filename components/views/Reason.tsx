@@ -117,9 +117,7 @@ export default function Reason({
     setBusy(true);
 
     const langName = lang; // API resolves display name server-side via prompt only; pass code is fine for prompting
-    let live: ReasonAnswer | null = null;
-    let apiError: string | null = null;
-    const livePromise = askBrain(q, langName, uploads);
+    const live = askBrain(q, langName, uploads).catch(() => null);
     const demo = pickDemo(q);
     const plan = demo?.agents ?? ["router", "retrieval", "reasoning", "synthesis"];
     setTrace({ agents: plan, step: 0, reasoning: [] });
@@ -130,22 +128,15 @@ export default function Reason({
       setTrace((tr) => (tr ? { ...tr, step: i + 1 } : tr));
     }
 
-    try {
-      live = await livePromise;
-    } catch (err) {
-      apiError = err instanceof Error ? err.message : "Unknown API error";
-      console.error("[CORTEX]", err);
-      setNote(apiError);
-    }
-
     const data: ReasonAnswer =
-      live ??
-      demo ?? {
-        confidence: 0,
-        agents: plan,
+      (await live) ||
+      demo || {
+        confidence: 0.4,
+        agents: ["router"],
         connections: [],
-        reasoning: ["Searched the corpus but found no strong match."],
-        answer: "${apiError ?? "The AI backend is unavailable. Check ANTHROPIC_API_KEY and redeploy."}",
+        reasoning: ["The live reasoning call did not return a response, so this is a local fallback, not a searched result."],
+        answer:
+          "I couldn't reach the reasoning engine just now, so I can't process a brand-new question this instant. While that recovers, the demo corpus covers P-101, the coke-oven hot-work permit, and overdue inspections — try one of those, or upload a document and ask about it directly.",
         workflow: null,
         citations: [],
       };
