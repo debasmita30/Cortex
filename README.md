@@ -27,6 +27,9 @@
 &nbsp;
 <img src="https://img.shields.io/badge/LLM%20Backend-Pluggable-B69CFF?style=for-the-badge"/>
 
+<img width="400" height="400" alt="qr-code" src="https://github.com/user-attachments/assets/ba685a6f-252a-4b2d-a396-97a4b88b4803" />
+
+
 > 🏆 **Built for ET AI Hackathon 2026 — Problem 8: Unified Asset & Operations Brain**
 > Cortex ingests a plant's scattered documents — P&IDs, work orders, SOPs, inspections, incidents, regulations — and reasons across them the way an experienced engineer would, in 20 languages, on any phone.
 
