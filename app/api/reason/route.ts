@@ -72,7 +72,7 @@ The "answer" MUST be in ${langName}. Keep under ~700 tokens.`;
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "claude-sonnet-4-20250514",
         max_tokens: 1000,
         system,
         messages: [{ role: "user", content }],
