@@ -71,12 +71,23 @@ The "answer" MUST be in ${langName}. Keep under ~700 tokens.`;
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
+        model: "llama-3.3-70b-versatile",
+        temperature: 0.2,
         max_tokens: 1000,
-        system,
-        messages: [{ role: "user", content }],
+        response_format: {
+        type: "json_object"
+    },
+    messages: [
+        {
+            role: "system",
+            content: system,
+        },
+        {
+            role: "user",
+            content: query,
+        },
+    ],
       }),
-    });
 
     if (!res.ok) {
       const errText = await res.text();
