@@ -6,8 +6,8 @@ import type { UploadedDoc } from "@/lib/types";
 export const runtime = "nodejs";
  
 
-const GROK_MODEL = "grok-4-1-fast-non-reasoning";
-const GROK_URL = "https://api.x.ai/v1/chat/completions";
+const MODEL = "deepseek/deepseek-r1-0528:free";
+const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
  
 interface ReqBody {
   query: string;
@@ -16,7 +16,7 @@ interface ReqBody {
 }
  
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.XAI_API_KEY;
+  const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
       { error: "XAI_API_KEY is not configured on the server. Add it in your Vercel project settings (and .env.local for local dev)." },
@@ -79,14 +79,13 @@ The "answer" MUST be in ${langName}. Keep under ~700 tokens.`;
   });
  
   try {
-    const res = await fetch(GROK_URL, {
+    const res = await fetch(OPENROUTER_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
+      headers: {"Content-Type": "application/json",Authorization: `Bearer ${apiKey}`,"HTTP-Referer": "http://localhost:3000","X-Title": 
+       "CORTEX",
+               },
       body: JSON.stringify({
-        model: GROK_MODEL,
+        model: MODEL,
         temperature: 0.3,
         max_tokens: 1200,
         messages: [
