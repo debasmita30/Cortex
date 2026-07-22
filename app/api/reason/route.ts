@@ -1,11 +1,10 @@
- 
+
 import { NextRequest, NextResponse } from "next/server";
 import { AGENTS, DOCS, EQUIPMENT, GRAPH } from "@/lib/data";
 import type { UploadedDoc } from "@/lib/types";
  
 export const runtime = "nodejs";
  
-// Swap this string if you want a different Gemini model later.
 const GEMINI_MODEL = "gemini-3.5-flash";
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
  
@@ -133,8 +132,7 @@ function safeParseModelJson(raw: string) {
         // fall through to final fallback
       }
     }
-    // The model replied in plain text instead of JSON — still surface it as a
-    // real answer rather than a dead refusal.
+
     return buildFallback(cleaned || "The model returned an empty response. Please try rephrasing your question.");
   }
 }
