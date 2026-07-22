@@ -11,7 +11,7 @@ interface ReqBody {
 }
 
 export async function POST(req: NextRequest) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
       { error: "ANTHROPIC_API_KEY is not configured on the server. Add it in your Vercel project settings or .env.local." },
